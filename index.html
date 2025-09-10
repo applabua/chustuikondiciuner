@@ -26,12 +26,12 @@
       overflow-x:hidden; touch-action:manipulation; overscroll-behavior:none;
     }
 
-    /* ФОН: через <img> (швидше, ніж background+fixed) */
+    /* ФОН через <img> — швидкий рендер */
     .bg{ position:absolute; inset:0; z-index:-2; overflow:hidden; }
     .bg img{
       width:100%; height:100%; object-fit:cover; object-position:center;
-      filter: blur(.9px);           /* мінімально */
-      transform: scale(1.02);       /* щоб не темніли краї після blur */
+      filter: blur(.9px);
+      transform: scale(1.02);
       will-change: transform;
     }
     .bg::after{
@@ -44,47 +44,62 @@
 
     .wrap{ max-width:1100px; margin:0 auto; padding:22px clamp(14px,3.2vw,28px) 48px; }
 
-    /* ТОП: бренд у лівому верхньому куті + малі кнопки в один ряд ліворуч */
+    /* ТОП: бренд + лого-крапка, кнопки під ним зліва */
     .topbar{
-      display:flex; align-items:center; justify-content:flex-start;
-      gap:12px; padding:6px 0 14px;
+      display:flex; flex-direction:column; align-items:flex-start;
+      gap:8px; padding:6px 0 14px;
     }
     .brand{
+      display:flex; align-items:center; gap:10px;
       font-weight:800; text-transform:uppercase; letter-spacing:.4px;
       font-size:clamp(16px,2.4vw,22px); line-height:1.1; white-space:nowrap;
-      margin-right:6px;
     }
-    /* БЕЗ крапки/маркера — видалено .brand .dot і символ • */
+    .brand .dot{
+      width:12px;height:12px;border-radius:50%;
+      background:#ff8a1f; box-shadow:0 0 0 6px rgba(255,138,31,.20);
+      flex:0 0 12px;
+    }
 
-    .cta-top{ display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+    .cta-top{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-start; }
     .btn{
       appearance:none; border:0; cursor:pointer; text-decoration:none;
       font-weight:700; color:#141414; background:linear-gradient(180deg,#ff9b3b,#ff8a1f);
       box-shadow:0 6px 16px rgba(255,138,31,.32), inset 0 1px 0 rgba(255,255,255,.35);
       border-radius:10px; transition:transform .08s, box-shadow .12s, opacity .2s;
       white-space:nowrap;
-      padding:12px 18px;            /* базовий розмір (внизу сторінки) */
+      padding:12px 18px;
     }
     .btn:active{ transform:translateY(1px) scale(.99); }
     .btn--ghost{ background:rgba(255,255,255,.10); color:#fff; box-shadow:inset 0 0 0 1px rgba(255,255,255,.22); }
 
-    /* МАЛІ кнопки у хедері */
-    .topbar .btn{ padding:8px 10px; font-size:clamp(12px,2.4vw,14px); border-radius:9px; }
+    /* МАЛІ кнопки в шапці */
+    .topbar .btn{ padding:7px 10px; font-size:clamp(12px,2.4vw,14px); border-radius:9px; }
     .topbar .btn--ghost{ color:#fff; }
 
-    /* Hero */
+    /* На ширших екранах — в один ряд зліва, але йдуть після бренду */
+    @media (min-width:860px){
+      .topbar{ flex-direction:row; align-items:center; }
+      .cta-top{ margin-left:8px; }
+    }
+
+    /* HERO */
     .hero{ display:grid; grid-template-columns:1fr; gap:22px; padding:6px 0 10px; }
     .badge{
       display:inline-flex; gap:10px; background:rgba(255,138,31,.95); color:#1b0a00;
       font-weight:800; border-radius:14px; padding:8px 12px; width:max-content;
       box-shadow:0 10px 22px rgba(255,138,31,.35); letter-spacing:.2px;
     }
-    .hero h1{ margin:0; font-size:clamp(28px,6.2vw,54px); line-height:1.05; font-weight:900; text-transform:uppercase; text-wrap:balance; }
+    .hero h1{
+      margin:0;
+      font-size:clamp(28px,6.2vw,54px);
+      line-height:1.12;           /* > читабельність */
+      font-weight:900; text-transform:uppercase; text-wrap:balance;
+      text-shadow:0 3px 10px rgba(0,0,0,.45);  /* не "зливається" з фоном */
+      letter-spacing:.2px;
+    }
     .hero p{ margin:0; font-size:clamp(15px,2.4vw,18px); color:#eaeaea; max-width:880px; }
     .hero .cta-top{ margin-top:6px; }
-    .hero .btn{ /* великі кнопки секції лишаємо як були */
-      padding:12px 18px; border-radius:12px; font-size:clamp(14px,2.6vw,16px);
-    }
+    .hero .btn{ padding:12px 18px; border-radius:12px; font-size:clamp(14px,2.6vw,16px); }
 
     /* Cards */
     .cards{ display:grid; grid-template-columns:repeat(12,1fr); gap:16px; margin-top:18px; }
@@ -124,14 +139,13 @@
     footer{ opacity:.9; font-size:13px; text-align:center; padding-top:24px; }
     .safe-bottom{ height: env(safe-area-inset-bottom); }
 
-    /* Трохи слабший blur на дуже вузьких екранах для продуктивності */
     @media (max-width:420px){
       .bg img{ filter: blur(.6px); }
     }
   </style>
 </head>
 <body>
-  <!-- ФОН через <img> для швидкого рендера -->
+  <!-- ФОН -->
   <div class="bg" aria-hidden="true">
     <img
       src="https://i.ibb.co/gFftbdMm/402aca30-0c83-41a0-b7a1-bbec39950726.png"
@@ -139,10 +153,9 @@
   </div>
 
   <div class="wrap">
-    <!-- Топ: бренд у лівому верхньому куті + МАЛІ кнопки в ряд -->
+    <!-- ШАПКА: бренд з крапкою-лого + кнопки зліва в ряд -->
     <header class="topbar">
-      <div class="brand">КОНДИЦІОНЕРИ ОДЕСА</div>
-
+      <div class="brand"><span class="dot"></span> КОНДИЦІОНЕРИ ОДЕСА</div>
       <nav class="cta-top" aria-label="Контакти зверху">
         <a class="btn" href="tel:+380958355990" aria-label="Подзвонити Анатолію">📞 Подзвонити</a>
         <a class="btn btn--ghost" href="viber://chat?number=%2B380958355990" aria-label="Написати у Viber">Viber</a>
@@ -150,7 +163,7 @@
       </nav>
     </header>
 
-    <!-- Hero -->
+    <!-- HERO -->
     <section class="hero">
       <span class="badge">Гарантія 12 місяців</span>
       <h1>Професійна установка, чистка, сервіс і продаж кондиціонерів</h1>
@@ -162,7 +175,7 @@
       </div>
     </section>
 
-    <!-- Послуги -->
+    <!-- ПОСЛУГИ -->
     <section id="services" class="cards">
 
       <article class="card grid-6">
